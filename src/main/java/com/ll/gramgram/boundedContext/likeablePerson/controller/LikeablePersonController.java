@@ -65,8 +65,8 @@ public class LikeablePersonController {
     @GetMapping("/delete/{id}")
     public String delete(Principal principal, @PathVariable("id") Integer id) {
         LikeablePerson likeablePerson = this.likeablePersonService.getLikeablePerson(id);
-        System.out.println(likeablePerson);
+        likeablePersonService.delete(likeablePerson);
 
-        return "redirect:/"; // 임시로 홈으로 302
+        return "redirect:/";
     }
 }
