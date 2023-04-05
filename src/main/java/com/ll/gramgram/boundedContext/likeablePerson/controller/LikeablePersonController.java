@@ -74,6 +74,6 @@ public class LikeablePersonController {
 
         likeablePersonService.delete(likeablePerson);
 
-        return "redirect:/";
+        return rq.redirectWithMsg("/likeablePerson/list", RsData.of("S-1", "호감상대를 삭제했습니다."));
     }
 }

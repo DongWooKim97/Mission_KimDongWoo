@@ -55,8 +55,7 @@ public class LikeablePersonService {
     }
 
     @Transactional
-    public RsData<LikeablePerson> delete(LikeablePerson likeablePerson) {
+    public void delete(LikeablePerson likeablePerson) {
         this.likeablePersonRepository.delete(likeablePerson);
-        return RsData.of("S-1", "호감상대를 삭제했습니다.");
     }
 }
