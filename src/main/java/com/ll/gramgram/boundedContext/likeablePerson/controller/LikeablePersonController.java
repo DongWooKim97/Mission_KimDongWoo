@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/likeablePerson")
@@ -29,18 +27,17 @@ public class LikeablePersonController {
     private final Rq rq;
     private final LikeablePersonService likeablePersonService;
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/add")
-    public String showAdd() {
-        return "usr/likeablePerson/add";
-    }
-
-    @PreAuthorize("isAuthenticated()")
     @AllArgsConstructor
     @Getter
     public static class AddForm {
         private final String username;
         private final int attractiveTypeCode;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/add")
+    public String showAdd() {
+        return "usr/likeablePerson/add";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -71,15 +68,18 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String delete(Principal principal, @PathVariable("id") Long id) {
-        LikeablePerson likeablePerson = this.likeablePersonService.getLikeablePerson(id);
+    public String delete(@PathVariable("id") Long id) {
+        LikeablePerson likeablePerson = this.likeablePersonService.findById(id).orElseThrow(null);
 
-        if (!rq.getMember().getInstaMember().getUsername().equals(likeablePerson.getFromInstaMemberUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다");
+        if (likeablePerson == null) {
+            return rq.historyBack("이미 취소된 호감입니다.");
         }
 
-        likeablePersonService.delete(likeablePerson);
+        if (!Objects.equals(rq.getMember().getInstaMember().getId(), likeablePerson.getFromInstaMember().getId())) {
+            return rq.historyBack("권한이 없습니다");
+        }
 
-        return rq.redirectWithMsg("/likeablePerson/list", RsData.of("S-1", "호감상대를 삭제했습니다."));
+        RsData deleteRs = likeablePersonService.delete(likeablePerson);
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRs);
     }
 }
