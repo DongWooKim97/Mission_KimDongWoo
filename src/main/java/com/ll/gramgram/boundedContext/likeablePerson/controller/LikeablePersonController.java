@@ -71,7 +71,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String delete(Principal principal, @PathVariable("id") Integer id) {
+    public String delete(Principal principal, @PathVariable("id") Long id) {
         LikeablePerson likeablePerson = this.likeablePersonService.getLikeablePerson(id);
 
         if (!rq.getMember().getInstaMember().getUsername().equals(likeablePerson.getFromInstaMemberUsername())) {
