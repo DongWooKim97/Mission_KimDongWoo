@@ -64,10 +64,13 @@ public class LikeablePersonController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
-        Member loginMember = rq.getMember();
-
         //로그인 주체 확인용
+        Member loginMember = rq.getMember();
         System.out.println(loginMember);
+
+        //삭제대상 확인용
+        InstaMember toInstaMember = this.likeablePersonService.findById(id).getToInstaMember();
+        System.out.println(toInstaMember);
 
         return "redirect:/";
     }
