@@ -54,8 +54,15 @@ public class LikeablePersonService {
     }
 
     @Transactional
-    public void delete(LikeablePerson likeablePerson) {
-        this.likeablePersonRepository.delete(likeablePerson);
-        System.out.println("삭제완료");
+    public RsData<LikeablePerson> delete(Long id) {
+        LikeablePerson deleteLikeablePerson = this.findById(id);
+
+        if (deleteLikeablePerson == null) {
+            return RsData.of("F-1", "이미 삭제된 호감대상입니다.");
+        }
+
+        this.likeablePersonRepository.delete(deleteLikeablePerson);
+
+        return RsData.of("S-1", "호감 대상이 삭제되었습니다.");
     }
 }
