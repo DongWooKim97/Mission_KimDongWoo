@@ -61,7 +61,7 @@ public class LikeablePersonController {
         return "usr/likeablePerson/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         RsData<LikeablePerson> deleteLikeablePerson = this.likeablePersonService.delete(id);
 
