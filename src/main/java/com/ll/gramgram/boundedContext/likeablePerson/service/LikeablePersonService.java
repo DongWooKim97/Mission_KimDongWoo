@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LikeablePersonService {
+    private final Rq rq;
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
 
@@ -49,20 +53,29 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
-    public LikeablePerson findById(Long id) {
-        return likeablePersonRepository.findById(id).orElse(null);
+    public Optional<LikeablePerson> findById(Long id) {
+        return this.likeablePersonRepository.findById(id);
     }
 
     @Transactional
-    public RsData<LikeablePerson> delete(Long id) {
-        LikeablePerson deleteLikeablePerson = this.findById(id);
+    public RsData delete(LikeablePerson likeablePerson) {
+        String toInstaMebmberUsername = likeablePerson.getToInstaMember().getUsername();
+        this.likeablePersonRepository.delete(likeablePerson);
 
-        if (deleteLikeablePerson == null) {
-            return RsData.of("F-1", "이미 삭제된 호감대상입니다.");
+        return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(toInstaMebmberUsername));
+    }
+
+    public RsData canActorDelete(Member actor, LikeablePerson likeablePerson) {
+        if (likeablePerson == null) {
+            return RsData.of("F-1", "이미 취소된 호감입니다.");
         }
+        if (!checkAuthrization(actor, likeablePerson)) {
+            return RsData.of("F-2", "삭제 권한이 업습니다.");
+        }
+        return RsData.of("S-1", "호감 대상이 삭제되었습니다.", likeablePerson);
+    }
 
-        this.likeablePersonRepository.delete(deleteLikeablePerson);
-
-        return RsData.of("S-1", "호감 대상(%s)이 삭제되었습니다.".formatted(deleteLikeablePerson.getToInstaMember().getUsername()));
+    public boolean checkAuthrization(Member actor, LikeablePerson likeablePerson) {
+        return Objects.equals(rq.getMember().getInstaMember().getId(), likeablePerson.getFromInstaMember().getId());
     }
 }

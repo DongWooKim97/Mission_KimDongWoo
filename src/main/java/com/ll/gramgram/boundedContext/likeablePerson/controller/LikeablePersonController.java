@@ -63,12 +63,21 @@ public class LikeablePersonController {
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
-        RsData<LikeablePerson> deleteLikeablePerson = this.likeablePersonService.delete(id);
+        LikeablePerson likeablePerson = this.likeablePersonService.findById(id).orElseThrow(null);
 
-        if (deleteLikeablePerson.isFail()) {
-            return rq.historyBack("이미 삭제된 호감대상입니다.");
+        RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
+
+        if (canActorDeleteRsData.isFail()) {
+            return rq.historyBack(canActorDeleteRsData);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteLikeablePerson);
+        RsData deleteRs = likeablePersonService.delete(likeablePerson);
+
+        if (deleteRs.isFail()) {
+            return rq.historyBack(deleteRs);
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRs);
     }
+    
 }
