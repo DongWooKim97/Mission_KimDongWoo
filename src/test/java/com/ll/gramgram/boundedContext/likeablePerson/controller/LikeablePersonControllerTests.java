@@ -76,7 +76,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(content().string(containsString("""
                         <input type="submit" value="추가"
                         """.stripIndent().trim())));
-        ;
     }
 
     @Test
@@ -97,7 +96,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("add"))
                 .andExpect(status().is3xxRedirection());
-        ;
     }
 
     @Test
@@ -118,7 +116,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("add"))
                 .andExpect(status().is3xxRedirection());
-        ;
     }
 
     @Test
@@ -147,6 +144,5 @@ public class LikeablePersonControllerTests {
                 .andExpect(content().string(containsString("""
                         <span class="toInstaMember_attractiveTypeDisplayName">성격</span>
                         """.stripIndent().trim())));
-        ;
     }
 }
