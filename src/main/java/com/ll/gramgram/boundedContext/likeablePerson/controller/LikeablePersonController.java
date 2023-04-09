@@ -69,8 +69,6 @@ public class LikeablePersonController {
             return rq.historyBack("이미 삭제된 호감대상입니다.");
         }
 
-        System.out.println(deleteLikeablePerson.getMsg());
-
         return rq.redirectWithMsg("/likeablePerson/list", deleteLikeablePerson);
     }
 }

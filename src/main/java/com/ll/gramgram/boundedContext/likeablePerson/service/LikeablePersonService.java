@@ -63,6 +63,6 @@ public class LikeablePersonService {
 
         this.likeablePersonRepository.delete(deleteLikeablePerson);
 
-        return RsData.of("S-1", "호감 대상이 삭제되었습니다.");
+        return RsData.of("S-1", "호감 대상(%s)이 삭제되었습니다.".formatted(deleteLikeablePerson.getToInstaMember().getUsername()));
     }
 }
