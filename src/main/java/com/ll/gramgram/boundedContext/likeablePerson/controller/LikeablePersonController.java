@@ -63,7 +63,7 @@ public class LikeablePersonController {
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
-        LikeablePerson likeablePerson = this.likeablePersonService.findById(id).orElseThrow(null);
+        LikeablePerson likeablePerson = this.likeablePersonService.findById(id).orElse(null);
 
         RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
@@ -79,5 +79,5 @@ public class LikeablePersonController {
 
         return rq.redirectWithMsg("/likeablePerson/list", deleteRs);
     }
-    
+
 }
