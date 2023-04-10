@@ -17,6 +17,9 @@
     - [] 확인 후, 등록여부에 따라
         - [] 등록 O -> 처리하면 안됨 (rq.historyBack)
         - [] 등록 X -> 새로운 등록
+    - [] 등록여부 확인 -> checkDuplicateAttractiveTypeCode()메서드 활용
+        - [] 로그인한 유저의 인스타아이디를 이용해 리스트를 뽑아내고, 이 리스트에서 addForm에서 입력받은 username과 attractiveTypeCode와 일치한 경우를 찾음.
+
 
 - [] 2번 케이스
     - [] 10명까지 호감상대 등록이 가능하고, 11명부터는 호감표시 불가.
