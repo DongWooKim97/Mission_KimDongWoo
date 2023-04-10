@@ -23,11 +23,15 @@ public class LikeablePersonService {
     @Transactional
     public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
         if (!member.hasConnectedInstaMember()) {
-            return RsData.of("F-2", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
+            return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
         }
 
         if (member.getInstaMember().getUsername().equals(username)) {
-            return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
+            return RsData.of("F-2", "본인을 호감상대로 등록할 수 없습니다.");
+        }
+
+        if (checkDuplicateAttractiveTypeCode(member, username, attractiveTypeCode)) {
+            return RsData.of("F-3", "이미 %s님을 호감으로 등록하였습니다.".formatted(username));
         }
 
         InstaMember fromInstaMember = member.getInstaMember();
@@ -81,5 +85,20 @@ public class LikeablePersonService {
             return RsData.of("F-2", "권한이 없습니다.");
 
         return RsData.of("S-1", "삭제가능합니다.");
+    }
+
+    public boolean checkDuplicateAttractiveTypeCode(Member member, String username, int attractiveTypeCode) {
+        List<LikeablePerson> checkList = this.likeablePersonRepository.findByFromInstaMemberId(member.getInstaMember().getId());
+
+        for (LikeablePerson likeablePerson : checkList) {
+
+            String toUsername = likeablePerson.getToInstaMember().getUsername();
+            int toAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
+
+            if (toUsername.equals(username) && toAttractiveTypeCode == attractiveTypeCode) {
+                return true;
+            }
+        }
+        return false;
     }
 }
