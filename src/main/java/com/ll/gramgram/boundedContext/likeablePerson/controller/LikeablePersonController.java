@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -58,7 +55,7 @@ public class LikeablePersonController {
 
         // 인스타인증을 했는지 체크
         if (instaMember != null) {
-//            List<LikeablePerson> likeablePeople = likeablePersonService.findByFromInstaMemberId(instaMember.getId());
+            // 해당 인스타회원이 좋아하는 사람들 목록
             List<LikeablePerson> likeablePeople = instaMember.getFromLikeablePeople();
             model.addAttribute("likeablePeople", likeablePeople);
         }
@@ -67,23 +64,18 @@ public class LikeablePersonController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
-        LikeablePerson likeablePerson = this.likeablePersonService.findById(id).orElse(null);
+        LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null);
 
         RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
-        if (canActorDeleteRsData.isFail()) {
-            return rq.historyBack(canActorDeleteRsData);
-        }
+        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
 
-        RsData deleteRs = likeablePersonService.delete(likeablePerson);
+        RsData deleteRsData = likeablePersonService.delete(likeablePerson);
 
-        if (deleteRs.isFail()) {
-            return rq.historyBack(deleteRs);
-        }
+        if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRs);
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }
-
 }
