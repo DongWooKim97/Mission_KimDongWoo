@@ -34,6 +34,10 @@ public class LikeablePersonService {
             return RsData.of("F-3", "이미 %s님을 호감으로 등록하였습니다.".formatted(username));
         }
 
+        if (checkFullLikeableList(member)) {
+            return RsData.of("F-4", "호감 표시는 10명이상 할 수 없습니다.");
+        }
+
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
@@ -100,5 +104,11 @@ public class LikeablePersonService {
             }
         }
         return false;
+    }
+
+    private boolean checkFullLikeableList(Member actor) {
+        int likealbePersonListSize = this.likeablePersonRepository.findByFromInstaMemberId(actor.getInstaMember().getId()).size();
+
+        return likealbePersonListSize == 10;
     }
 }
