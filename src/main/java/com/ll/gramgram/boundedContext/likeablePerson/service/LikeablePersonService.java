@@ -106,9 +106,9 @@ public class LikeablePersonService {
         return false;
     }
 
-    private boolean checkFullLikeableList(Member actor) {
-        int likealbePersonListSize = this.likeablePersonRepository.findByFromInstaMemberId(actor.getInstaMember().getId()).size();
+    private boolean checkFullLikeableList(Member member) {
+        int fromLikeablePeople = member.getInstaMember().getFromLikeablePeople().size();
 
-        return likealbePersonListSize == 10;
+        return fromLikeablePeople >= 10;
     }
 }
