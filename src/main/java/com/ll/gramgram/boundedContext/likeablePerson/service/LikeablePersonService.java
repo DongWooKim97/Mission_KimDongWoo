@@ -7,6 +7,7 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,23 +22,34 @@ public class LikeablePersonService {
     private final InstaMemberService instaMemberService;
 
     @Transactional
-    public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
+    public RsData<LikeablePerson> checkValidationBeforeLike(Member member, String username, int attractiveTypeCode) {
+        InstaMember fromInstaMember = member.getInstaMember();
+        InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
+
+
         if (!member.hasConnectedInstaMember()) {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
         }
 
-        if (member.getInstaMember().getUsername().equals(username)) {
+        if (fromInstaMember.getUsername().equals(username)) {
             return RsData.of("F-2", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
-        if (checkDuplicateAttractiveTypeCode(member, username, attractiveTypeCode)) {
-            return RsData.of("F-3", "이미 %s님을 호감으로 등록하였습니다.".formatted(username));
+        if (fromInstaMember.getFromLikeablePeople().size() >= 10) {
+            return RsData.of("F-3", "호감 표시는 10명이상 할 수 없습니다.");
         }
 
-        if (checkFullLikeableList(member)) {
-            return RsData.of("F-4", "호감 표시는 10명이상 할 수 없습니다.");
+        int checkDuplicateMemberResult = checkDuplicateLikeableMember(member, username, attractiveTypeCode);
+        if (checkDuplicateMemberResult != 0) {
+            if (checkDuplicateMemberResult == 1) return RsData.of("F-4", "이미 %s님을 호감으로 등록하였습니다.".formatted(username));
+            if (checkDuplicateMemberResult == 2) return update(member, username, attractiveTypeCode);
         }
 
+        return like(member, username, attractiveTypeCode);
+    }
+
+    @Transactional
+    public RsData like(Member member, String username, int attractiveTypeCode) {
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
@@ -59,6 +71,32 @@ public class LikeablePersonService {
         toInstaMember.addToLikeablePerson(likeablePerson);
 
         return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+    }
+
+    @Transactional
+    @Modifying
+    public RsData update(Member member, String username, int attractiveTypeCode) {
+        InstaMember fromInstaMember = member.getInstaMember();
+        InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
+        Long fromInstaMemberId = fromInstaMember.getId();
+        Long toInstaMemberId = toInstaMember.getId();
+
+//        칼럼의 고유ID
+        Long updatePersonId = this.likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromInstaMemberId, toInstaMemberId).getId();
+
+        LikeablePerson updatePerson = LikeablePerson
+                .builder()
+                .id(updatePersonId)
+                .fromInstaMember(fromInstaMember) // 호감을 표시하는 사람의 인스타 멤버
+                .fromInstaMemberUsername(fromInstaMember.getUsername()) // 중요하지 않음
+                .toInstaMember(toInstaMember) // 호감을 받는 사람의 인스타 멤버
+                .toInstaMemberUsername(toInstaMember.getUsername()) // 중요하지 않음
+                .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
+                .build();
+
+        likeablePersonRepository.save(updatePerson); // 저장
+
+        return RsData.of("S-2", "호감수정완료");
     }
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
@@ -91,24 +129,22 @@ public class LikeablePersonService {
         return RsData.of("S-1", "삭제가능합니다.");
     }
 
-    public boolean checkDuplicateAttractiveTypeCode(Member member, String username, int attractiveTypeCode) {
-        List<LikeablePerson> checkList = this.likeablePersonRepository.findByFromInstaMemberId(member.getInstaMember().getId());
+    public int checkDuplicateLikeableMember(Member member, String username, int attractiveTypeCode) {
+        List<LikeablePerson> loginMemberLikeablePeople = member.getInstaMember().getFromLikeablePeople();
 
-        for (LikeablePerson likeablePerson : checkList) {
 
+        for (LikeablePerson likeablePerson : loginMemberLikeablePeople) {
             String toUsername = likeablePerson.getToInstaMember().getUsername();
             int toAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
 
-            if (toUsername.equals(username) && toAttractiveTypeCode == attractiveTypeCode) {
-                return true;
+            if (toUsername.equals(username) && attractiveTypeCode == toAttractiveTypeCode) {
+                return 1;
+            }
+            if (toUsername.equals(username)) {
+                return 2;
             }
         }
-        return false;
+        return 0;
     }
 
-    private boolean checkFullLikeableList(Member member) {
-        int fromLikeablePeople = member.getInstaMember().getFromLikeablePeople().size();
-
-        return fromLikeablePeople >= 10;
-    }
 }
