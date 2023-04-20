@@ -1,4 +1,4 @@
-package com.ll.gramgram.base.entity;
+package com.ll.gramgram.base.baseEntity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -26,10 +26,8 @@ public class BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-
     @CreatedDate
     private LocalDateTime createDate;
-
     @LastModifiedDate
     private LocalDateTime modifyDate;
 }

@@ -1,6 +1,6 @@
 package com.ll.gramgram.boundedContext.member.entity;
 
-import com.ll.gramgram.base.entity.BaseEntity;
+import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,12 +23,9 @@ import java.util.List;
 @ToString(callSuper = true)
 public class Member extends BaseEntity {
     private String providerTypeCode; // 일반회원인지, 카카오로 가입한 회원인지, 구글로 가입한 회원인지
-
     @Column(unique = true)
     private String username;
-
     private String password;
-
     @OneToOne // 1:1
     @Setter // memberService::updateInstaMember 함수 때문에
     private InstaMember instaMember;

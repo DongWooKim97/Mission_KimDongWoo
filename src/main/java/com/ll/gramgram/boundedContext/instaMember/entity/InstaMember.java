@@ -1,6 +1,6 @@
 package com.ll.gramgram.boundedContext.instaMember.entity;
 
-import com.ll.gramgram.base.entity.BaseEntity;
+import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +19,6 @@ import java.util.List;
 public class InstaMember extends BaseEntity {
     @Column(unique = true)
     private String username;
-
     @Setter
     private String gender;
 

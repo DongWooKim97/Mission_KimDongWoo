@@ -121,7 +121,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("설정파일에 있는 최대가능호감표시 수 가져오기")
     void t003() throws Exception {
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
-
+        System.out.println(likeablePersonFromMax);
         assertThat(likeablePersonFromMax).isEqualTo(10);
     }
 
