@@ -1,7 +1,7 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 
-import com.ll.gramgram.base.config.AppConfig;
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
