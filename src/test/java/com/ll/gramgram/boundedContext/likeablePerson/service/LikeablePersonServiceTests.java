@@ -66,14 +66,29 @@ public class LikeablePersonServiceTests {
 
     @Test
     @DisplayName("테스트 2")
-    void t002() {
+    void t002() throws Exception {
+        // 2번 좋아요 정보를 가져온다.
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE id = 2;
+        */
         LikeablePerson likeablePersonId2 = likeablePersonService.findById(2L).get();
 
+        // 2번 좋아요를 발생시킨(호감을 표시한) 인스타회원을 가져온다.
+        // 그 회원의 인스타아이디는 insta_user3 이다.
+        /*
+        SELECT *
+        FROM insta_member
+        WHERE id = 2;
+        */
         InstaMember instaMemberInstaUser3 = likeablePersonId2.getFromInstaMember();
         assertThat(instaMemberInstaUser3.getUsername()).isEqualTo("insta_user3");
 
+        // 내가 새로 호감을 표시하려는 사람의 인스타 아이디
         String usernameToLike = "insta_user4";
 
+        // v1
         LikeablePerson likeablePersonIndex0 = instaMemberInstaUser3.getFromLikeablePeople().get(0);
         LikeablePerson likeablePersonIndex1 = instaMemberInstaUser3.getFromLikeablePeople().get(1);
 
@@ -95,15 +110,18 @@ public class LikeablePersonServiceTests {
             }
         }
 
-        long count = instaMemberInstaUser3.getFromLikeablePeople()
+        // v3
+        long count = instaMemberInstaUser3
+                .getFromLikeablePeople()
                 .stream()
                 .filter(lp -> lp.getToInstaMember().getUsername().equals(usernameToLike))
                 .count();
 
         if (count > 0) {
-            System.out.println("v3 : 이미 나(인스타아이디: insta_user3)는 insta_user4에게 호감을 표시했구나.");
+            System.out.println("v3 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
         }
 
+        // v4
         LikeablePerson oldLikeablePerson = instaMemberInstaUser3
                 .getFromLikeablePeople()
                 .stream()
@@ -121,12 +139,12 @@ public class LikeablePersonServiceTests {
     @DisplayName("설정파일에 있는 최대가능호감표시 수 가져오기")
     void t003() throws Exception {
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
-        System.out.println(likeablePersonFromMax);
+
         assertThat(likeablePersonFromMax).isEqualTo(10);
     }
 
     @Test
-    @DisplayName("JPA 언더바 활용")
+    @DisplayName("테스트 4")
     void t004() throws Exception {
         // 좋아하는 사람이 2번 인스타 회원인 `좋아요` 검색
         /*
