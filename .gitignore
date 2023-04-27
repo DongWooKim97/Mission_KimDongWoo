@@ -39,3 +39,5 @@ out/
 
 ### custom ###
 application-secret.yml
+
+src/main/generated
