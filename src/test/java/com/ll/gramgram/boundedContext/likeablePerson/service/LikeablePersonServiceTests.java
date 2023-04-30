@@ -22,10 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LikeablePersonServiceTests {
     @Autowired
     private LikeablePersonService likeablePersonService;
-
     @Autowired
     private LikeablePersonRepository likeablePersonRepository;
-
 
     @Test
     @DisplayName("테스트 1")
@@ -131,7 +129,7 @@ public class LikeablePersonServiceTests {
 
         if (oldLikeablePerson != null) {
             System.out.println("v4 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
-            System.out.printf("v4 : 기존 호감사유 : %s%n", oldLikeablePerson.getAttractiveTypeDisplayName());
+            System.out.println("v4 : 기존 호감사유 : %s".formatted(oldLikeablePerson.getAttractiveTypeDisplayName()));
         }
     }
 

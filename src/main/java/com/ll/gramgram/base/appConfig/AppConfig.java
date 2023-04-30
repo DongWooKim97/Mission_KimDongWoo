@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-
 public class AppConfig {
     @Getter
     private static long likeablePersonFromMax;
@@ -14,5 +13,4 @@ public class AppConfig {
     public void setLikeablePersonFromMax(long likeablePersonFromMax) {
         AppConfig.likeablePersonFromMax = likeablePersonFromMax;
     }
-
 }
