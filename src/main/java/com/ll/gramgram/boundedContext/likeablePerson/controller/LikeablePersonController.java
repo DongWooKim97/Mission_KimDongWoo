@@ -6,8 +6,7 @@ import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +36,9 @@ public class LikeablePersonController {
         @NotBlank
         @Size(min = 3, max = 30)
         private final String username;
-        @NotBlank
-        @Size(min = 1, max = 1)
+        @NotNull
+        @Min(1)
+        @Max(3)
         private final int attractiveTypeCode;
     }
 
@@ -102,18 +102,29 @@ public class LikeablePersonController {
     @AllArgsConstructor
     @Getter
     public static class ModifyForm {
+        @NotNull
+        @Min(1)
+        @Max(3)
         private final int attractiveTypeCode;
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String modify(@PathVariable Long id, @Valid ModifyForm modifyForm) {
-        RsData<LikeablePerson> rsData = likeablePersonService.modifyLike(rq.getMember(), id, modifyForm.getAttractiveTypeCode());
+        RsData<LikeablePerson> rsData = likeablePersonService.modifyAttractive(rq.getMember(), id, modifyForm.getAttractiveTypeCode());
 
         if (rsData.isFail()) {
             return rq.historyBack(rsData);
         }
 
         return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/toList")
+    @ResponseBody
+    public String showToList(Model model) {
+        //TODO : showToList 구현해야 함
+        return "usr/likeablePerson/toList 구현해야 함";
     }
 }
