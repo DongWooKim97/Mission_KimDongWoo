@@ -263,4 +263,33 @@ public class LikeablePersonServiceTests {
                 likeablePersonToBts.getModifyUnlockDate().isAfter(coolTime)
         ).isTrue();
     }
+
+    @Test
+    @DisplayName("호감 표시 이후에 쿨타임이 다 되지 않으면 변경할 수 없다.")
+    void t009() throws Exception {
+        LocalDateTime coolTime = AppConfig.genLikeablePersonModifyUnlockDate();
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        LikeablePerson likeablePersonToBts = likeablePersonService.like(memberUser3, "bts", 3).getData();
+
+        // 1시간 확인용
+        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().plusSeconds(60 * 60));
+        assertThat(likeablePersonToBts.getModifyUnlockDate().isBefore(coolTime)).isTrue();
+
+        //호감변경 + 갱신 -> 2시간 확인용
+        likeablePersonService.modifyAttractive(memberUser3, likeablePersonToBts, 1);
+        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().plusSeconds(60 * 60 * 2));
+        assertThat(likeablePersonToBts.getModifyUnlockDate().isBefore(coolTime)).isTrue();
+
+        //호감변경 + 갱신 -> 3시간 확인용
+        likeablePersonService.modifyAttractive(memberUser3, likeablePersonToBts, 2);
+        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().plusSeconds((60 * 60 * 3) - 1));
+        assertThat(likeablePersonToBts.getModifyUnlockDate().isBefore(coolTime)).isTrue();
+
+
+        //호감변경 + 갱신 -> 3시간 확인용
+        likeablePersonService.modifyAttractive(memberUser3, likeablePersonToBts, 3);
+        TestUt.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().plusSeconds((60 * 60 * 3)));
+        assertThat(likeablePersonToBts.getModifyUnlockDate().isBefore(coolTime)).isFalse();
+    }
 }
