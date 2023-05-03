@@ -169,6 +169,10 @@ public class LikeablePersonService {
 
         String newAttractiveTypeDisplayName = likeablePerson.getAttractiveTypeDisplayName();
 
+        if (likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-5", likeablePerson.getModifyUnlockDateRemainStrHuman() + "후에 가능합니다");
+        }
+
         return RsData.of("S-3", "%s님에 대한 호감사유를 %s에서 %s(으)로 변경합니다.".formatted(username, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName), likeablePerson);
     }
 
